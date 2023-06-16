@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-void main() {
+import 'main_app.dart';
+
+void main() async {
+  await _initHive();
   runApp(const MainApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
-    );
-  }
+Future<void> _initHive() async{
+  await Hive.initFlutter();
+  await Hive.openBox("login");
+  await Hive.openBox("accounts");
 }
