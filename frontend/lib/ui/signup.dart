@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -22,6 +24,11 @@ class _SignupState extends State<Signup> {
 
   final Box _boxAccounts = Hive.box("accounts");
   bool _obscurePassword = true;
+  
+  
+  get email => String;
+  
+  get password => String;
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +65,7 @@ class _SignupState extends State<Signup> {
                   ),
                 ),
                 validator: (String? value) {
+                  // FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
                   if (value == null || value.isEmpty) {
                     return "Please enter username.";
                   } else if (_boxAccounts.containsKey(value)) {
@@ -194,7 +202,8 @@ class _SignupState extends State<Signup> {
                         );
 
                         _formKey.currentState?.reset();
-
+                        FirebaseAuth.instance.createUserWithEmailAndPassword(
+                            email: email, password: password);
                         Navigator.pop(context);
                       }
                     },
