@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -24,11 +23,6 @@ class _SignupState extends State<Signup> {
 
   final Box _boxAccounts = Hive.box("accounts");
   bool _obscurePassword = true;
-  
-  
-  get email => String;
-  
-  get password => String;
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +59,6 @@ class _SignupState extends State<Signup> {
                   ),
                 ),
                 validator: (String? value) {
-                  // FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
                   if (value == null || value.isEmpty) {
                     return "Please enter username.";
                   } else if (_boxAccounts.containsKey(value)) {
@@ -181,31 +174,38 @@ class _SignupState extends State<Signup> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    onPressed: () {
-                      if (_formKey.currentState?.validate() ?? false) {
-                        _boxAccounts.put(
-                          _controllerUsername.text,
-                          _controllerConFirmPassword.text,
-                        );
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            width: 200,
-                            backgroundColor:
-                                Theme.of(context).colorScheme.secondary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            behavior: SnackBarBehavior.floating,
-                            content: const Text("Registered Successfully"),
-                          ),
-                        );
+
 
                         _formKey.currentState?.reset();
-                        FirebaseAuth.instance.createUserWithEmailAndPassword(
-                            email: email, password: password);
-                        Navigator.pop(context);
+                       await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                            email: _controllerEmail.text, password: _controllerPassword.text).then((value) {
+                         _boxAccounts.put(
+                           _controllerEmail.text,
+                           _controllerConFirmPassword.text,
+                         );
+                         ScaffoldMessenger.of(context).showSnackBar(
+                           SnackBar(
+                             width: 200,
+                             backgroundColor:
+                             Theme
+                                 .of(context)
+                                 .colorScheme
+                                 .secondary,
+                             shape: RoundedRectangleBorder(
+                               borderRadius: BorderRadius.circular(10),
+                             ),
+                             behavior: SnackBarBehavior.floating,
+                             content: const Text("Registered Successfully"),
+                           ),
+                         );
+                       }
+                       );
+                        
                       }
+                  
                     },
                     child: const Text("Register"),
                   ),
