@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -22,7 +23,6 @@ class _LoginState extends State<Login> {
 
   bool _obscurePassword = true;
   final Box _boxLogin = Hive.box("login");
-  final Box _boxAccounts = Hive.box("accounts");
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +53,7 @@ class _LoginState extends State<Login> {
                 controller: _controllerUsername,
                 keyboardType: TextInputType.name,
                 decoration: InputDecoration(
-                  labelText: "Username",
+                  labelText: "Email id ",
                   prefixIcon: const Icon(Icons.person_outline),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -65,9 +65,7 @@ class _LoginState extends State<Login> {
                 onEditingComplete: () => _focusNodePassword.requestFocus(),
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
-                    return "Please enter username.";
-                  } else if (!_boxAccounts.containsKey(value)) {
-                    return "Username is not registered.";
+                    return "Please enter Email id.";
                   }
 
                   return null;
@@ -101,10 +99,7 @@ class _LoginState extends State<Login> {
                 validator: (String? value) {
                   if (value == null || value.isEmpty) {
                     return "Please enter password.";
-                  } else if (value !=
-                      _boxAccounts.get(_controllerUsername.text)) {
-                    return "Wrong password.";
-                  }
+                  } 
 
                   return null;
                 },
@@ -119,19 +114,20 @@ class _LoginState extends State<Login> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    onPressed: () {
-                      if (_formKey.currentState?.validate() ?? false) {
-                        _boxLogin.put("loginStatus", true);
-                        _boxLogin.put("userName", _controllerUsername.text);
-
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return Home();
-                            },
-                          ),
-                        );
+                    onPressed: ()async {
+                      if (_formKey.currentState!.validate()) {
+                       await FirebaseAuth.instance.signInWithEmailAndPassword(email: _controllerUsername.text.trim(), password: _controllerPassword.text.trim()).then((value){
+                          _boxLogin.put("loginStatus", true);
+                          _boxLogin.put("userName", _controllerUsername.text);
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return Home();
+                              },
+                            ),
+                          );
+                        });
                       }
                     },
                     child: const Text("Login"),
